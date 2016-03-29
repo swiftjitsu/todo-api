@@ -108,6 +108,46 @@ app.delete('/todos/:id', function(req,res){
 	}
 });
 
+// put /todos/:id
+app.put('/todos/:id',function(req,res){
+	var todosId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id: todosId});
+	var body = _.pick(req.body, 'description','completed');
+	var validAttributes = {};
+
+	if(!matchedTodo) {
+		
+		console.log('No match found.');
+		return res.status(404).send();
+
+	} else { console.log('Match found'); }
+
+ 	if(	body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
+		validAttributes.completed = body.completed;
+		console.log('valid completed attribute.');
+	} else if (body.hasOwnProperty('completed') ) {
+		return res.status(400).send();
+	}
+	
+	if( body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
+
+		console.log('validated description');
+
+		validAttributes.description = body.description;
+	} else if ( body.hasOwnProperty('description')) {
+		return res.status(400).send();
+	}
+
+	// Update here
+	_.extend(matchedTodo, validAttributes);
+
+
+});
+
+
+
+
+
 app.listen(PORT, function(){
 	console.log('ToDo App listening on ' + PORT);
 });
